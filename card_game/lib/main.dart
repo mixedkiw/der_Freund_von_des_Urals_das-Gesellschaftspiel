@@ -1,5 +1,7 @@
+// main.dart
 import 'package:flutter/material.dart';
 import 'splash_screen.dart';
+import 'qr_scanner_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,8 +32,15 @@ class MyApp extends StatelessWidget {
 }
 
 /// Главный экран игры
-class MainGameScreen extends StatelessWidget {
+class MainGameScreen extends StatefulWidget {
   const MainGameScreen({super.key});
+
+  @override
+  State<MainGameScreen> createState() => _MainGameScreenState();
+}
+
+class _MainGameScreenState extends State<MainGameScreen> {
+  String? scannedResult;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +53,6 @@ class MainGameScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
-              
               // Логотип
               Container(
                 width: 150,
@@ -79,9 +87,7 @@ class MainGameScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
               const SizedBox(height: 40),
-              
               // Название игры
               const Text(
                 'Проблемы и суперкоманды',
@@ -93,9 +99,7 @@ class MainGameScreen extends StatelessWidget {
                   height: 1.2,
                 ),
               ),
-              
               const SizedBox(height: 30),
-              
               // Описание игры
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -110,17 +114,24 @@ class MainGameScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
               const SizedBox(height: 40),
-              
               // Кнопка "Вперёд"
               Container(
                 width: double.infinity,
                 margin: const EdgeInsets.only(bottom: 30),
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Здесь будет переход к следующему экрану
-                    // Пока просто оставим пустым
+                  onPressed: () async {
+                    final result = await Navigator.push<String?>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const QRScannerScreen(),
+                      ),
+                    );
+                    if (result != null) {
+                      setState(() {
+                        scannedResult = result;
+                      });
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -143,6 +154,19 @@ class MainGameScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              if (scannedResult != null)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Отсканированная информация: $scannedResult',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
             ],
           ),
         ),

@@ -1,3 +1,4 @@
+// splash_screen.dart
 import 'package:flutter/material.dart';
 
 /// Загрузочный экран с вращающимися карточками
@@ -82,6 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
         _currentColorIndex = (_currentColorIndex + 1) % cardColors.length;
         _currentTextIndex = (_currentTextIndex + 1) % loadingTexts.length;
         setState(() {});
+
         // Перезапускаем анимацию
         _mainController.reset();
         _startAnimationCycle();
@@ -110,7 +112,6 @@ class _SplashScreenState extends State<SplashScreen>
       builder: (context, child) {
         // Плавное переключение цветов (происходит за 200ms в конце цикла)
         final colorChangeProgress = (_mainController.value - 0.85).clamp(0, 1) / 0.15;
-        
         Color bgColor = Color.lerp(
           cardColors[_currentColorIndex],
           cardColors[(_currentColorIndex + 1) % cardColors.length],
@@ -194,7 +195,6 @@ class AnimatedCard extends StatelessWidget {
         // Общее время = cycleDuration (3000ms)
         // Каждая карточка переворачивается за flipDuration (400ms)
         // Задержка между карточками = (cycleDuration - flipDuration) / totalCards
-        
         final totalDurationMs = 3000; // cycleDuration
         final delayBetween = (totalDurationMs - flipDuration) / totalCards;
         final flipStartTime = cardIndex * delayBetween;
