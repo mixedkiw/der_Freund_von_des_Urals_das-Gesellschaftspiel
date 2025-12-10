@@ -23,11 +23,16 @@ class _GameFieldScreenState extends State<GameFieldScreen>
   void initState() {
     super.initState();
     
-    // Устанавливаем ландшафтную ориентацию
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]).catchError((_) {});
+    // Отложить установку ориентации чтобы избежать конфликта с ориентацией экрана
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        // Устанавливаем ландшафтную ориентацию
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]).catchError((_) {});
+      }
+    });
 
     // Инициализируем флипы (все карты показывают leader сторону - false)
     isFlipped = List.filled(widget.cardNumbers.length, false);

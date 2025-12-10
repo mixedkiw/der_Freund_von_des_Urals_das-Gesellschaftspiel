@@ -221,11 +221,16 @@ class _RotateScreenWrapperState extends State<_RotateScreenWrapper> {
   void initState() {
     super.initState();
     
-    // Устанавливаем только ландшафтную ориентацию
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]).catchError((_) {});
+    // Отложить установку ориентации чтобы избежать конфликта с ориентацией экрана
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        // Устанавливаем только ландшафтную ориентацию
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]).catchError((_) {});
+      }
+    });
 
     // Показываем это окно 2.5 секунды, потом переходим на игровое поле
     Future.delayed(const Duration(milliseconds: 2500), () {
