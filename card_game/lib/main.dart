@@ -1,9 +1,16 @@
 // main.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'splash_screen.dart';
 import 'qr_scanner_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // Добавляем обработку ошибок для debug
+  FlutterError.onError = (FlutterErrorDetails details) {
+    print('Flutter error: ${details.exception}');
+  };
   runApp(const MyApp());
 }
 
@@ -32,15 +39,8 @@ class MyApp extends StatelessWidget {
 }
 
 /// Главный экран игры
-class MainGameScreen extends StatefulWidget {
+class MainGameScreen extends StatelessWidget {
   const MainGameScreen({super.key});
-
-  @override
-  State<MainGameScreen> createState() => _MainGameScreenState();
-}
-
-class _MainGameScreenState extends State<MainGameScreen> {
-  String? scannedResult;
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +51,9 @@ class _MainGameScreenState extends State<MainGameScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 60),
               // Логотип
               Container(
                 width: 150,
@@ -69,17 +70,32 @@ class _MainGameScreenState extends State<MainGameScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Image.asset(
-                    'assets/images/Logo.png',
+                  child: Image.network(
+                    'https://cdn.mywebicons.ru/i/webp/8e218155ee312a2cb1d9603c5d44dc70.webp',
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: Colors.white,
                         child: const Center(
                           child: Icon(
-                            Icons.error_outline,
+                            Icons.image_not_supported,
                             color: Color(0xFF00926E),
                             size: 50,
+                          ),
+                        ),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        color: Colors.white,
+                        child: const Center(
+                          child: SizedBox(
+                            width: 50,
+                            height: 50,
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF00926E),
+                            ),
                           ),
                         ),
                       );
@@ -114,24 +130,18 @@ class _MainGameScreenState extends State<MainGameScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 50),
               // Кнопка "Вперёд"
-              Container(
+              SizedBox(
                 width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 30),
                 child: ElevatedButton(
-                  onPressed: () async {
-                    final result = await Navigator.push<String?>(
+                  onPressed: () {
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const QRScannerScreen(),
                       ),
                     );
-                    if (result != null) {
-                      setState(() {
-                        scannedResult = result;
-                      });
-                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -140,7 +150,7 @@ class _MainGameScreenState extends State<MainGameScreen> {
                       horizontal: 32,
                     ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
+                      borderRadius: BorderRadius.circular(50),
                     ),
                     elevation: 4,
                   ),
@@ -154,19 +164,6 @@ class _MainGameScreenState extends State<MainGameScreen> {
                   ),
                 ),
               ),
-              if (scannedResult != null)
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Отсканированная информация: $scannedResult',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
             ],
           ),
         ),
