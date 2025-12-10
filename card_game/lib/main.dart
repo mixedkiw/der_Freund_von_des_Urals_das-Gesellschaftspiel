@@ -6,10 +6,18 @@ import 'qr_scanner_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  
+  try {
+    // SystemChrome не работает на Web, поэтому заворачиваем в try-catch
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  } catch (e) {
+    // Игнорируем ошибки на Web и других платформах
+    debugPrint('Ориентация экрана не поддерживается');
+  }
+  
   // Добавляем обработку ошибок для debug
   FlutterError.onError = (FlutterErrorDetails details) {
-    print('Flutter error: ${details.exception}');
+    debugPrint('Flutter error: ${details.exception}');
   };
   runApp(const MyApp());
 }
@@ -184,6 +192,7 @@ class _LoadingWrapperState extends State<LoadingWrapper> {
   bool _showHome = false;
 
   void _handleLoadComplete() {
+    print('⏳ Загрузка завершена, переходим на главный экран');
     setState(() {
       _showHome = true;
     });
@@ -191,6 +200,7 @@ class _LoadingWrapperState extends State<LoadingWrapper> {
 
   @override
   Widget build(BuildContext context) {
+    print('🔵 LoadingWrapper build called, _showHome=$_showHome');
     if (!_showHome) {
       return SplashScreen(onLoadComplete: _handleLoadComplete);
     }
