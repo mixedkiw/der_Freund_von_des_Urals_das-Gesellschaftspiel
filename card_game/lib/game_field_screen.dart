@@ -15,7 +15,7 @@ class GameFieldScreen extends StatefulWidget {
 }
 
 class _GameFieldScreenState extends State<GameFieldScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late List<bool> isFlipped; // Флип состояние каждой карты
   late List<AnimationController> animationControllers;
 
