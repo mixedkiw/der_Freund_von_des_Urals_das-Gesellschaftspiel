@@ -76,11 +76,11 @@ class _GameFieldScreenState extends State<GameFieldScreen>
             // Главное игровое поле с картами в колонку
             Center(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: List.generate(
                   widget.cardNumbers.length,
                   (index) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: _buildFlipCard(
                       index,
                       widget.cardNumbers[index],
@@ -160,8 +160,8 @@ class _GameFieldScreenState extends State<GameFieldScreen>
         : 'assets/cards/${cardNumber}_issue.png';
 
     return Container(
-      width: 100,
-      height: 140,
+      width: 120,
+      height: 180,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
