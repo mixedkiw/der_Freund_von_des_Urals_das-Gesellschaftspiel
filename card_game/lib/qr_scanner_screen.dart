@@ -1,87 +1,277 @@
-// qr_scanner_screen.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'game_field_screen.dart';
 
-// На Web всегда показываем Web версию
-class QRScannerScreen extends StatelessWidget {
+class QRScannerScreen extends StatefulWidget {
   const QRScannerScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const QRScannerWeb();
-  }
+  State<QRScannerScreen> createState() => _QRScannerScreenState();
 }
 
-
-// Для Web версии
-class QRScannerWeb extends StatefulWidget {
-  const QRScannerWeb({super.key});
+class _QRScannerScreenState extends State<QRScannerScreen> {
+  late MobileScannerController cameraController;
+  final List<int> scannedCards = []; // Отсканированные номера карт
+  bool isScanning = true;
 
   @override
-  State<QRScannerWeb> createState() => _QRScannerWebState();
-}
+  void initState() {
+    super.initState();
+    cameraController = MobileScannerController(
+      autoStart: true,
+    );
+  }
 
-class _QRScannerWebState extends State<QRScannerWeb> {
+  @override
+  void dispose() {
+    cameraController.dispose();
+    super.dispose();
+  }
+
+  void _handleBarcode(BarcodeCapture barcodes) {
+    // Если уже отсканировали 3 карты, ничего не делаем
+    if (scannedCards.length >= 3 || !isScanning) {
+      return;
+    }
+
+    for (final barcode in barcodes.barcodes) {
+      final String? rawValue = barcode.rawValue;
+      
+      if (rawValue != null && rawValue.isNotEmpty) {
+        // Пытаемся парсить номер из QR кода (цифра 1-9)
+        try {
+          final int cardNumber = int.parse(rawValue);
+          
+          if (cardNumber >= 1 && cardNumber <= 9) {
+            // Валидная карта!
+            setState(() {
+              scannedCards.add(cardNumber);
+              isScanning = false; // Приостанавливаем сканирование
+            });
+
+            // Показываем уведомление
+            _showCardAddedNotification(cardNumber);
+            
+            // Если отсканировали 3 карты, переходим на экран поворота
+            if (scannedCards.length == 3) {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (mounted) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          _RotateScreenWrapper(cardNumbers: scannedCards),
+                    ),
+                  );
+                }
+              });
+            } else {
+              // Иначе возобновляем сканирование через 1.5 секунды
+              Future.delayed(const Duration(milliseconds: 1500), () {
+                if (mounted) {
+                  setState(() {
+                    isScanning = true;
+                  });
+                }
+              });
+            }
+            break; // Обрабатываем только первый распознанный баркод
+          }
+        } catch (e) {
+          // Игнорируем QR коды которые не являются цифрами
+          debugPrint('Ошибка парсинга QR: $rawValue');
+        }
+      }
+    }
+  }
+
+  void _showCardAddedNotification(int cardNumber) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('✓ Карта добавлена'),
+        content: Text('Карта $cardNumber была добавлена в вашу колоду'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('ОК'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScannerError(
+    BuildContext context,
+    MobileScannerException error,
+  ) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.error, color: Colors.red, size: 64),
+        const SizedBox(height: 16),
+        Text('Ошибка камеры: $error'),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF00926E),
       appBar: AppBar(
-        title: const Text('Сканер QR-кода'),
+        title: const Text('QR сканер'),
         backgroundColor: const Color(0xFF00926E),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.qr_code_2,
-              size: 64,
-              color: Colors.white,
+      body: Stack(
+        children: [
+          // Камера
+          MobileScanner(
+            controller: cameraController,
+            onDetect: isScanning ? _handleBarcode : null,
+            errorBuilder: _buildScannerError,
+            placeholderBuilder: (context) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          ),
+          // UI сверху камеры
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Рамка сканирования
+                Container(
+                  width: 250,
+                  height: 250,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 3),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                // Текст с информацией о сканировании
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Сканировано карт: ${scannedCards.length}/3',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
-            const Text(
-              'QR сканер работает на мобильных устройствах',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+          ),
+          // Инструкция внизу
+          Positioned(
+            bottom: 24,
+            left: 24,
+            right: 24,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(12),
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 32.0),
-              child: Text(
-                'Откройте это приложение на вашем смартфоне или планшете для сканирования QR кодов.',
+              child: const Text(
+                'Направьте камеру на QR код\nс номером карты (1-9)',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(height: 48),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 32,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50),
-                ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Промежуточный экран "Переверните телефон"
+class _RotateScreenWrapper extends StatefulWidget {
+  final List<int> cardNumbers;
+
+  const _RotateScreenWrapper({required this.cardNumbers});
+
+  @override
+  State<_RotateScreenWrapper> createState() => _RotateScreenWrapperState();
+}
+
+class _RotateScreenWrapperState extends State<_RotateScreenWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    
+    // Устанавливаем только ландшафтную ориентацию
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]).catchError((_) {});
+
+    // Показываем это окно 2.5 секунды, потом переходим на игровое поле
+    Future.delayed(const Duration(milliseconds: 2500), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                GameFieldScreen(cardNumbers: widget.cardNumbers),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF00926E),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              '↻',
+              style: TextStyle(
+                fontSize: 80,
+                color: Colors.white,
               ),
-              child: const Text(
-                'Вернуться',
-                style: TextStyle(
-                  color: Color(0xFF00926E),
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+            ),
+            const SizedBox(height: 32),
+            const Text(
+              'Переверните телефон',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Подождите секунду...',
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.8),
+                fontSize: 16,
               ),
             ),
           ],
