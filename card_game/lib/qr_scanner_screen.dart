@@ -53,7 +53,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             // Показываем уведомление
             _showCardAddedNotification(cardNumber);
             
-            // Если отсканировали 3 карты, переходим на экран поворота
+            // Если отсканировали 3 карты, переходим на игровое поле
             if (scannedCards.length == 3) {
               Future.delayed(const Duration(milliseconds: 500), () {
                 if (mounted) {
@@ -61,7 +61,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          _RotateScreenWrapper(cardNumbers: scannedCards),
+                          GameFieldScreen(cardNumbers: scannedCards),
                     ),
                   );
                 }
@@ -201,86 +201,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Промежуточный экран "Переверните телефон"
-class _RotateScreenWrapper extends StatefulWidget {
-  final List<int> cardNumbers;
-
-  const _RotateScreenWrapper({required this.cardNumbers});
-
-  @override
-  State<_RotateScreenWrapper> createState() => _RotateScreenWrapperState();
-}
-
-class _RotateScreenWrapperState extends State<_RotateScreenWrapper> {
-  @override
-  void initState() {
-    super.initState();
-    
-    // Отложить установку ориентации чтобы избежать конфликта с ориентацией экрана
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) {
-        // Устанавливаем только ландшафтную ориентацию
-        SystemChrome.setPreferredOrientations([
-          DeviceOrientation.landscapeLeft,
-          DeviceOrientation.landscapeRight,
-        ]).catchError((_) {});
-      }
-    });
-
-    // Показываем это окно 2.5 секунды, потом переходим на игровое поле
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) =>
-                GameFieldScreen(cardNumbers: widget.cardNumbers),
-          ),
-        );
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF00926E),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              '↻',
-              style: TextStyle(
-                fontSize: 80,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 32),
-            const Text(
-              'Переверните телефон',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Подождите секунду...',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.8),
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

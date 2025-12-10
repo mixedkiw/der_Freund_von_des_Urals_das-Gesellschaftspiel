@@ -23,16 +23,10 @@ class _GameFieldScreenState extends State<GameFieldScreen>
   void initState() {
     super.initState();
     
-    // Отложить установку ориентации чтобы избежать конфликта с ориентацией экрана
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (mounted) {
-        // Устанавливаем ландшафтную ориентацию
-        SystemChrome.setPreferredOrientations([
-          DeviceOrientation.landscapeLeft,
-          DeviceOrientation.landscapeRight,
-        ]).catchError((_) {});
-      }
-    });
+    // Устанавливаем портретную ориентацию
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]).catchError((_) {});
 
     // Инициализируем флипы (все карты показывают leader сторону - false)
     isFlipped = List.filled(widget.cardNumbers.length, false);
@@ -49,11 +43,6 @@ class _GameFieldScreenState extends State<GameFieldScreen>
 
   @override
   void dispose() {
-    // Возвращаемся на портретную ориентацию
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-    ]).catchError((_) {});
-    
     for (var controller in animationControllers) {
       controller.dispose();
     }
@@ -74,7 +63,7 @@ class _GameFieldScreenState extends State<GameFieldScreen>
   }
 
   void _exitGame() {
-    Navigator.pop(context);
+    Navigator.popUntil(context, (route) => route.isFirst);
   }
 
   @override
@@ -84,14 +73,14 @@ class _GameFieldScreenState extends State<GameFieldScreen>
       body: SafeArea(
         child: Stack(
           children: [
-            // Главное игровое поле с картами
+            // Главное игровое поле с картами в колонку
             Center(
-              child: Row(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
                   widget.cardNumbers.length,
                   (index) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
                     child: _buildFlipCard(
                       index,
                       widget.cardNumbers[index],
@@ -104,12 +93,20 @@ class _GameFieldScreenState extends State<GameFieldScreen>
             Positioned(
               top: 16,
               left: 16,
-              child: FloatingActionButton(
-                onPressed: _exitGame,
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF00926E),
-                mini: true,
-                child: const Icon(Icons.exit_to_app),
+              child: GestureDetector(
+                onTap: _exitGame,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.close,
+                    color: Color(0xFF00926E),
+                    size: 24,
+                  ),
+                ),
               ),
             ),
           ],
@@ -130,17 +127,23 @@ class _GameFieldScreenState extends State<GameFieldScreen>
           // Когда достигаем 0.5, переключаемся на другую сторону
           final isLeaderSide = flipValue < 0.5;
           
-          // Поворот карты (от 0 до pi во время флипа)
+          // Поворот карты (от 0 до pi во время флипа) - только по Y оси
           final angle = flipValue * 3.14159265359;
+          
+          // Зеркалирование для issue стороны - только горизонтально
+          final scaleX = isLeaderSide ? 1.0 : -1.0;
           
           return Transform(
             alignment: Alignment.center,
             transform: Matrix4.identity()
               ..setEntry(3, 2, 0.001) // Перспектива
               ..rotateY(angle),
-            child: _buildCardWidget(
-              cardNumber: cardNumber,
-              isLeaderSide: isLeaderSide,
+            child: Transform.scale(
+              scaleX: scaleX,
+              child: _buildCardWidget(
+                cardNumber: cardNumber,
+                isLeaderSide: isLeaderSide,
+              ),
             ),
           );
         },
@@ -157,81 +160,55 @@ class _GameFieldScreenState extends State<GameFieldScreen>
         : 'assets/cards/${cardNumber}_issue.png';
 
     return Container(
-      width: 150,
-      height: 220,
+      width: 140,
+      height: 200,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF000000).withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Попытка загрузить карту из assets
-            Image.asset(
-              imagePath,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                // Fallback: показываем placeholder если карта не найдена
-                return Container(
-                  color: Colors.white,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Карта $cardNumber',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF00926E),
-                          ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Попытка загрузить карту из assets
+          Image.asset(
+            imagePath,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              // Fallback: показываем placeholder если карта не найдена
+              return Container(
+                color: Colors.white,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Карта $cardNumber',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF00926E),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          isLeaderSide ? 'Leader' : 'Issue',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF00926E),
-                          ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        isLeaderSide ? 'Leader' : 'Issue',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF00926E),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                );
-              },
-            ),
-            // Поверх карты - информация (опционально)
-            Positioned(
-              bottom: 12,
-              left: 12,
-              right: 12,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(
-                  isLeaderSide ? 'Tap to flip' : '',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          ],
-        ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
