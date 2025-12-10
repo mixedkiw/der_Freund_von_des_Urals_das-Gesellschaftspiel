@@ -33973,7 +33973,7 @@ r===$&&A.b()
 return A.R2(s,A.nd(r[a],new A.a4n(this,a,b),s),B.bU,!1,s,s,s,s,s,s,s,s,s,s,s,s,new A.a4o(this,a),s,s,s)},
 OW(a,b){var s=null,r="assets/cards/"+a,q=b?r+"_leader.png":r+"_issue.png"
 r=A.c([new A.eX(0,B.dE,A.aO(B.c.ah(76.5),B.j.E()>>>16&255,B.j.E()>>>8&255,B.j.E()&255),B.ie,8)],t.sq)
-return A.hj(A.mn(B.bN,A.c([A.aem(q,new A.a4m(a,b),B.fF)],t.E),B.Iu),s,new A.dd(s,s,s,s,r,s,B.ai),180,s,s,120)}}
+return A.hj(A.mn(B.bN,A.c([A.aem(q,new A.a4m(a,b),B.fF)],t.E),B.Iu),s,new A.dd(s,s,s,s,r,s,B.ai),165,s,s,110)}}
 A.a4r.prototype={
 $1(a){},
 $S:25}
@@ -34024,7 +34024,7 @@ O(a){var s=null
 return new A.tD(B.CL,"\u041f\u0440\u043e\u0431\u043b\u0435\u043c\u044b \u0438 \u0441\u0443\u043f\u0435\u0440\u043a\u043e\u043c\u0430\u043d\u0434\u044b",A.abl(B.wk,s,A.ads(B.O,s,s,B.aC),B.aC,!0),s)}}
 A.Ce.prototype={
 O(a){var s=null,r=A.i5(20),q=A.c([new A.eX(0,B.dE,A.aO(51,B.j.E()>>>16&255,B.j.E()>>>8&255,B.j.E()&255),B.ie,10)],t.sq)
-return A.ab3(s,B.aC,A.Z5(!0,new A.d8(B.zR,A.l1(A.c([B.Ik,A.hj(new A.Ab(A.i5(20),A.aem("images/Logo.png",new A.T0(),B.fF),s),s,new A.dd(s,s,s,r,q,s,B.ai),150,s,s,150),B.vu,B.Nm,B.Ii,B.Fq,B.Ij,A.afS(new A.B3(new A.T1(a),s,s,s,A.an5(s,s,B.i,s,s,s,4,s,s,s,s,s,B.zU,s,new A.cG(A.i5(50),B.t),s,s,s,s,s),s,s,!1,s,!0,s,B.Nl,s),s,1/0)],t.E),B.ak,B.b_,B.bb),s),!0))}}
+return A.ab3(s,B.aC,A.Z5(!0,new A.d8(B.zR,A.l1(A.c([B.Ik,A.hj(new A.Ab(A.i5(20),A.aem("assets/images/Logo.png",new A.T0(),B.fF),s),s,new A.dd(s,s,s,r,q,s,B.ai),150,s,s,150),B.vu,B.Nm,B.Ii,B.Fq,B.Ij,A.afS(new A.B3(new A.T1(a),s,s,s,A.an5(s,s,B.i,s,s,s,4,s,s,s,s,s,B.zU,s,new A.cG(A.i5(50),B.t),s,s,s,s,s),s,s,!1,s,!0,s,B.Nl,s),s,1/0)],t.E),B.ak,B.b_,B.bb),s),!0))}}
 A.T0.prototype={
 $3(a,b,c){var s=null
 return A.hj(B.y7,B.i,s,s,s,s,s)},
@@ -63863,7 +63863,7 @@ B.h6=new A.aK(75e3)
 B.zI=new A.aK(-38e3)
 B.zJ=new A.Pi(0,"tonalSpot")
 B.bp=new A.aV(0,0,0,0)
-B.zL=new A.aV(0,4,0,4)
+B.zL=new A.aV(0,6,0,6)
 B.zM=new A.aV(12,12,12,12)
 B.zN=new A.aV(12,8,12,8)
 B.zO=new A.aV(16,0,16,0)

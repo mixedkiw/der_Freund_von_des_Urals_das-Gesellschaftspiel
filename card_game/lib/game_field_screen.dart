@@ -80,7 +80,7 @@ class _GameFieldScreenState extends State<GameFieldScreen>
                 children: List.generate(
                   widget.cardNumbers.length,
                   (index) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    padding: const EdgeInsets.symmetric(vertical: 6.0),
                     child: _buildFlipCard(
                       index,
                       widget.cardNumbers[index],
@@ -160,8 +160,8 @@ class _GameFieldScreenState extends State<GameFieldScreen>
         : 'assets/cards/${cardNumber}_issue.png';
 
     return Container(
-      width: 120,
-      height: 180,
+      width: 110,
+      height: 165,
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
