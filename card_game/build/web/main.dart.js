@@ -7105,6 +7105,7 @@ xp:function xp(a){var _=this
 _.d=$
 _.e=a
 _.f=!0
+_.r=!1
 _.c=_.a=null},
 a5Z:function a5Z(a,b){this.a=a
 this.b=b},
@@ -33972,7 +33973,7 @@ r===$&&A.b()
 return A.R2(s,A.nd(r[a],new A.a4n(this,a,b),s),B.bU,!1,s,s,s,s,s,s,s,s,s,s,s,s,new A.a4o(this,a),s,s,s)},
 OW(a,b){var s=null,r="assets/cards/"+a,q=b?r+"_leader.png":r+"_issue.png"
 r=A.c([new A.eX(0,B.dE,A.aO(B.c.ah(76.5),B.j.E()>>>16&255,B.j.E()>>>8&255,B.j.E()&255),B.id,8)],t.sq)
-return A.hj(A.mn(B.bN,A.c([A.aem(q,new A.a4m(a,b),B.fF)],t.E),B.Iu),s,new A.dd(s,s,s,s,r,s,B.ai),200,s,s,140)}}
+return A.hj(A.mn(B.bN,A.c([A.aem(q,new A.a4m(a,b),B.fF)],t.E),B.Iu),s,new A.dd(s,s,s,s,r,s,B.ai),140,s,s,100)}}
 A.a4r.prototype={
 $1(a){},
 $S:25}
@@ -34056,7 +34057,7 @@ s===$&&A.b()
 s.l()
 this.aF()},
 RJ(a){var s,r,q,p,o,n,m,l=this,k=l.e
-if(k.length>=3||!l.f)return
+if(k.length>=3||!l.f||l.r)return
 for(q=a.a,p=q.length,o=t.P,n=0;n<q.length;q.length===p||(0,A.w)(q),++n){s=q[n].z
 if(s!=null&&s.length!==0)try{r=A.d0(s,null)
 if(r>=1&&r<=9){new A.a5Z(l,r).$0()
@@ -34087,7 +34088,8 @@ return A.ab3(new A.qq(B.No,k,B.aC,new A.J0(m,m,1/0,56),m),m,A.mn(B.bN,A.c([new A
 A.a5Z.prototype={
 $0(){var s=this.a
 s.e.push(this.b)
-s.f=!1},
+s.f=!1
+s.r=!0},
 $S:0}
 A.a6_.prototype={
 $0(){var s,r=this.a,q=r.c
@@ -34109,7 +34111,9 @@ $0(){var s=this.a
 if(s.c!=null)s.aL(new A.a5X(s))},
 $S:29}
 A.a5X.prototype={
-$0(){this.a.f=!0},
+$0(){var s=this.a
+s.f=!0
+s.r=!1},
 $S:0}
 A.a62.prototype={
 $1(a){var s=null
@@ -63859,7 +63863,7 @@ B.h6=new A.aK(75e3)
 B.zI=new A.aK(-38e3)
 B.zJ=new A.Pi(0,"tonalSpot")
 B.bq=new A.aV(0,0,0,0)
-B.zL=new A.aV(0,16,0,16)
+B.zL=new A.aV(0,8,0,8)
 B.zM=new A.aV(12,12,12,12)
 B.zN=new A.aV(12,8,12,8)
 B.zO=new A.aV(16,0,16,0)

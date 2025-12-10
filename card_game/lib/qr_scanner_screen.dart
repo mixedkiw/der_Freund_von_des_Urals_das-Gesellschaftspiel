@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'game_field_screen.dart';
 
@@ -14,6 +13,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   late MobileScannerController cameraController;
   final List<int> scannedCards = []; // Отсканированные номера карт
   bool isScanning = true;
+  bool isProcessingDialog = false; // Флаг чтобы не обрабатывать баркоды пока Alert открыт
 
   @override
   void initState() {
@@ -30,8 +30,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
   }
 
   void _handleBarcode(BarcodeCapture barcodes) {
-    // Если уже отсканировали 3 карты, ничего не делаем
-    if (scannedCards.length >= 3 || !isScanning) {
+    // Если уже отсканировали 3 карты, или Alert открыт, или сканирование отключено - ничего не делаем
+    if (scannedCards.length >= 3 || !isScanning || isProcessingDialog) {
       return;
     }
 
@@ -48,6 +48,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
             setState(() {
               scannedCards.add(cardNumber);
               isScanning = false; // Приостанавливаем сканирование
+              isProcessingDialog = true; // Блокируем обработку пока Alert открыт
             });
 
             // Показываем уведомление
@@ -72,6 +73,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                 if (mounted) {
                   setState(() {
                     isScanning = true;
+                    isProcessingDialog = false; // Разблокируем обработку
                   });
                 }
               });
