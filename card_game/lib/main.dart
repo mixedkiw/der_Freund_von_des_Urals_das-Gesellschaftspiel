@@ -78,8 +78,8 @@ class MainGameScreen extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Image.network(
-                    'https://cdn.mywebicons.ru/i/webp/8e218155ee312a2cb1d9603c5d44dc70.webp',
+                  child: Image.asset(
+                    'images/Logo.png',
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
@@ -89,21 +89,6 @@ class MainGameScreen extends StatelessWidget {
                             Icons.image_not_supported,
                             color: Color(0xFF00926E),
                             size: 50,
-                          ),
-                        ),
-                      );
-                    },
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Container(
-                        color: Colors.white,
-                        child: const Center(
-                          child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: CircularProgressIndicator(
-                              color: Color(0xFF00926E),
-                            ),
                           ),
                         ),
                       );
